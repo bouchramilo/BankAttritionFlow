@@ -1,62 +1,70 @@
-import pandas as pd
-import numpy as np
-from pyspark.sql import functions as F
-from fonctionss.viz import viz, viz_all
+
+from fonctionss.viz import visualization
+# ! ============================================================================================================
+def detecte_outliers_with_iqr(data, column):
+    
+    df_analyser = data.copy()
+    Q1 = df_analyser[column].quantile(0.25)
+    Q3 = df_analyser[column].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    print("Shape : ", data.shape)
+    print("Q1 (25%) : ", Q1)
+    print("Q3 (75%) : ", Q3)
+    print("IQR : ", IQR)
+    
+    bande_inf = Q1 - 1.5 * IQR
+    bande_sup = Q1 + 1.5 * IQR
+    
+    mask_outliers = (df_analyser[column] < bande_inf) | (df_analyser[column] > bande_sup)
+    outliers = df_analyser[mask_outliers]
+    n_outliers = mask_outliers.sum()
+    df_analyser = df_analyser[~mask_outliers]
+    
+
+    print(f"Nombre des outliers détectés : {n_outliers}")
+    print(f"Pourcentage f'outliers: {(n_outliers/len(df_analyser))*100:.2f}%")
+    print(f"Limites: [{bande_inf:.2f}, {bande_sup:.2f}]]")
+    # print(f"Dataset.head() =  {df_analyser.head()}")
+    
+    print(f"La distribution des {column} avec les bornes sup/inf :")
+        
+    visualization(data, column, bande_inf, bande_sup) 
+
+    return outliers, bande_inf, bande_sup, IQR
 
 
-def outliers_detections_cols(df, cols, prob_lower=0.25, prob_upper=0.75):
-    """
-    Calcule les bornes IQR et le nombre d'outliers pour chaque colonne.
-    Retourne une liste de tuples : (col, q1, q3, iqr, lower, upper, total)
-    """
-    reports = []
+# ! ============================================================================================================
 
-    for c in cols:
-        q1, q3 = df.approxQuantile(c, [prob_lower, prob_upper], 0.01)
-        iqr = q3 - q1
-        lower_bound = q1 - 1.5 * iqr
-        upper_bound = q3 + 1.5 * iqr
+def detecte_remote_outliers_with_iqr(data, column):
+    df_analyser = data.copy()
+    Q1 = df_analyser[column].quantile(0.25)
+    Q3 = df_analyser[column].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    print("Shape : ", data.shape)
+    print("Q1 (25%) : ", Q1)
+    print("Q3 (75%) : ", Q3)
+    print("IQR : ", IQR)
+    
+    bande_inf = Q1 - 1.5 * IQR
+    bande_sup = Q1 + 1.5 * IQR
+    
+    mask_outliers = (df_analyser[column] < bande_inf) | (df_analyser[column] > bande_sup)
+    outliers = df_analyser[mask_outliers]
+    n_outliers = mask_outliers.sum()
+    df_analyser = df_analyser[~mask_outliers]
+    
 
-        count_lower = df.filter(F.col(c) < lower_bound).count()
-        count_upper = df.filter(F.col(c) > upper_bound).count()
-        total = count_lower + count_upper
+    print(f"Nombre des outliers détectés : {n_outliers}")
+    print(f"Pourcentage f'outliers: {(n_outliers/len(df_analyser))*100:.2f}%")
+    print(f"Limites: [{bande_inf:.2f}, {bande_sup:.2f}]]")
+    # print(f"Dataset.head() =  {df_analyser.head()}")
+    
+    print(f"La distribution des {column} avec les bornes sup/inf :")
+      
+    visualization(df_analyser, column, bande_inf, bande_sup) 
+    
+    return df_analyser, outliers, bande_inf, bande_sup, IQR
 
-        reports.append((c, q1, q3, iqr, lower_bound, upper_bound, total))
-
-    return reports
-
-
-
-
-def outliers_detection_col(df, c, prob_lower=0.25, prob_upper=0.75):
-    """
-    Calcule les bornes IQR et le nombre d'outliers pour une seule colonne.
-    """
-    q1, q3 = df.approxQuantile(c, [prob_lower, prob_upper], 0.01)
-    iqr = q3 - q1
-    lower_bound = q1 - 1.5 * iqr
-    upper_bound = q3 + 1.5 * iqr
-
-    count_lower = df.filter(F.col(c) < lower_bound).count()
-    count_upper = df.filter(F.col(c) > upper_bound).count()
-    total = count_lower + count_upper
-
-    return [(c, q1, q3, iqr, lower_bound, upper_bound, total)]
-
-
-
-
-def visualize_outliers(df_spark, cols, prob_lower=0.25, prob_upper=0.75):
-    """
-    Combine les calculs Spark et la visualisation matplotlib.
-    """
-
-    reports = outliers_detections_cols(df_spark, cols, prob_lower, prob_upper)
-
-    pdf = df_spark.toPandas()
-
-    bounds = {r[0]: (r[4], r[5]) for r in reports}
-
-    viz_all(pdf, cols, show_iqr=True, bounds_dict=bounds)
-
-    return pd.DataFrame(reports, columns=["col", "Q1", "Q3", "IQR", "lower", "upper", "outliers_total"])
+# ! ============================================================================================================
