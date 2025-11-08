@@ -26,11 +26,11 @@ num_products = st.number_input("Num of Products")
 has_card = st.selectbox("Has Credit Card", [0, 1])
 is_active = st.selectbox("Is Active Member", [0, 1])
 gender = st.selectbox("Gender", ["Male", "Female"])
-geography = st.selectbox("Geography", ["France", "Spain", "Germany"])
+geography = st.selectbox("Geography", ["France", "Germany", "Spain"])
 
 # Encodage manuel
 gender_map = {'Male': 0, 'Female': 1}
-geography_map = {'France': 0, 'Spain': 1, 'Germany': 2}
+geography_map = {'France': 0, 'Germany': 1, 'Spain': 2}
 
 data = pd.DataFrame([{
     'CreditScore': credit_score,
