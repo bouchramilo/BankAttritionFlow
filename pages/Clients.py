@@ -1,8 +1,10 @@
 import streamlit as st
+import pyspark
 from pyspark.sql import SparkSession
 from pyspark.ml import PipelineModel
 from pyspark.sql.functions import lit
-
+import os
+import sys
 
 st.set_page_config(
     page_title="Prédiction",
@@ -13,6 +15,10 @@ st.set_page_config(
 st.title("💳 Prédiction de churn bancaire")
 
 
+# Configuration des variables d'environnement Python
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
+
 # --------------------------
 spark = SparkSession.builder \
     .appName("MongoDB-PySpark-PyMongo") \
@@ -20,18 +26,9 @@ spark = SparkSession.builder \
     .config("spark.executor.memory", "4g") \
     .config("spark.python.worker.timeout", "600") \
     .master("local[*]") \
-    .config("spark.hadoop.io.nativeio.NativeIO$Windows.enabled", "false") \
     .getOrCreate()
+    # .config("spark.hadoop.io.nativeio.NativeIO$Windows.enabled", "false") \
     
-
-
-# --------------------------
-# Charger le modèle
-model_path = "C:/tmp/best_lr_model"
-loaded_model = PipelineModel.load(model_path)
-
-
-
 
 
 
@@ -65,6 +62,12 @@ data_dict = [{
 }]
 
 df_new = spark.createDataFrame(data_dict)
+
+
+# --------------------------
+# Charger le modèle
+model_path = "C:/tmp/best_lr_model"
+loaded_model = PipelineModel.load(model_path)
 
 
 # --------------------------
