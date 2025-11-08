@@ -1,4 +1,4 @@
-# 💳 Prédiction de churn bancaire
+# 💳 Prédiction de l'Attrition Client Bancaire
 
 ## Contexte du projet
 Dans le secteur bancaire, anticiper la perte de clients est essentiel pour réduire le taux d’attrition et améliorer la fidélisation.  
