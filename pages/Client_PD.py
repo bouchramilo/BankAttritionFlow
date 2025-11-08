@@ -14,7 +14,7 @@ with open(path_model, "rb") as f:
 
 
 
-st.title("💳 Prédiction de churn bancaire")
+st.title("💳Prédiction de l'Attrition Client Bancaire")
 
 # Entrées utilisateur
 credit_score = st.number_input("Credit Score")

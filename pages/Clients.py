@@ -12,7 +12,7 @@ st.set_page_config(
     layout='wide'
 )
 
-st.title("💳 Prédiction de churn bancaire")
+st.title("💳 Prédiction de l'Attrition Client Bancaire")
 
 
 # Configuration des variables d'environnement Python

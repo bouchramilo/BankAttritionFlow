@@ -6,7 +6,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("💳 Prédiction de churn bancaire")
+st.title("💳 Prédiction de l'Attrition Client Bancaire")
 
 st.markdown("""
 ### Contexte du projet
